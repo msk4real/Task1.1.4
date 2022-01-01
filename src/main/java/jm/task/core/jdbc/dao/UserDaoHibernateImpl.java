@@ -3,6 +3,8 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.*;
+
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,6 @@ public class UserDaoHibernateImpl implements UserDao {
     SessionFactory sessionFactory = new Util().getSessionFactory();
 
     public UserDaoHibernateImpl() {
-
     }
 
     @Override
@@ -21,7 +22,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     "name VARCHAR(50) NOT NULL, lastName VARCHAR(50) NOT NULL, " +
                     "age TINYINT NOT NULL)";
             session.beginTransaction();
-            session.createSQLQuery(sql);
+            session.createSQLQuery(sql).executeUpdate();
             session.getTransaction().commit();
             System.out.println("Таблица \"users\" создана");
         } catch (Exception e) {
@@ -73,8 +74,7 @@ public class UserDaoHibernateImpl implements UserDao {
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
-            String sql = "Select * from users";
-            users = session.createSQLQuery(sql).list();
+            users = session.createQuery("SELECT u FROM User u", User.class).getResultList();
             session.getTransaction().commit();
             System.out.println("Список всех юзеров:");
         } catch (Exception e) {
